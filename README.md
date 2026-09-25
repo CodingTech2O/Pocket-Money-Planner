@@ -1,5 +1,9 @@
 # Pocket Money Planner
 
+**Live demo:** <https://pocket-money-planner.onrender.com/>
+
+> The demo runs on Render's free tier, so the first load after a period of inactivity can take up to a minute while the server wakes up.
+
 A small Flask web app for students. You enter your monthly pocket money and how much you want to save in a year. The app works out how much to set aside and how much you can spend, each month and each week.
 
 ## Features
