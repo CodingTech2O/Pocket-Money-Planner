@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+
+{% block title %}Sign up · Pocket Money Planner{% endblock %}
+
+{% block content %}
+<section class="auth">
+    <div class="auth-card card" data-reveal>
+        <p class="eyebrow">Step 1 of 2</p>
+        <h1 class="display">Create your <em>account.</em></h1>
+        <form method="POST" action="{{ url_for('sign_up') }}" class="form" novalidate>
+            {{ form.hidden_tag() }}
+            {{ field(form.username, autocomplete="username") }}
+            {{ field(form.password, autocomplete="new-password", toggle=True) }}
+            <div class="strength" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+            {{ field(form.confirm_password, autocomplete="new-password", toggle=True) }}
+            <button type="submit" class="btn btn-primary btn-lg btn-block magnetic">
+                Continue
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+        </form>
+        <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+    </div>
+</section>
+{% endblock %}

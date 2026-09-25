@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}{% if data %}Dashboard · Pocket Money Planner{% else %}Pocket Money Planner{% endif %}{% endblock %}
+
+{% block content %}
+{% if data %}
+{# ---------------------------------------------------------------- Dashboard #}
+{% set income_year = data['monthly-inc'] * 12 %}
+{% set save_pct = (data['yearly-goal'] / income_year * 100) if income_year else 0 %}
+
+<section class="dash-head" data-reveal>
+    <div>
+        <p class="eyebrow">Your plan</p>
+        <h1 class="display">Hi {{ user }}, <em>here's the plan.</em></h1>
+        <p class="lede">You'll keep <strong>{{ '%.0f' % save_pct }}%</strong> of your pocket money and still have money to spend every week.</p>
+    </div>
+    <a href="{{ url_for('details', username=user) }}" class="btn btn-ghost">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg>
+        Edit plan
+    </a>
+</section>
+
+<section class="bento">
+    <article class="card card-hero spotlight" data-reveal>
+        <p class="card-label">Yearly savings goal</p>
+        <p class="hero-number">
+            <span class="cur">₹</span><span data-count="{{ data['yearly-goal'] }}">{{ '{:,.0f}'.format(data['yearly-goal']) }}</span>
+        </p>
+        <p class="card-sub">out of <span class="num" data-count="{{ income_year }}">{{ '{:,.0f}'.format(income_year) }}</span> total pocket money this year</p>
+        <div class="progress" role="img" aria-label="Saving {{ '%.0f' % save_pct }}% of yearly pocket money">
+            <div class="progress-fill" style="--w: {{ save_pct }}%"></div>
+        </div>
+        <div class="progress-scale"><span>0%</span><span>{{ '%.0f' % save_pct }}% saved</span><span>100%</span></div>
+    </article>
+
+    <article class="card card-ring spotlight" data-reveal>
+        <p class="card-label">Where each month's money goes</p>
+        <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 180 180" data-save="{{ data['monthly-goal'] }}" data-spend="{{ data['monthly-spend'] }}" role="img"
+                 aria-label="Save ₹{{ '{:,.0f}'.format(data['monthly-goal']) }}, spend ₹{{ '{:,.0f}'.format(data['monthly-spend']) }} each month">
+                <circle class="ring-track" cx="90" cy="90" r="72"/>
+                <circle class="ring-arc ring-save" cx="90" cy="90" r="72"/>
+                <circle class="ring-arc ring-spend" cx="90" cy="90" r="72"/>
+            </svg>
+            <div class="ring-center">
+                <span class="ring-value">₹<span data-count="{{ data['monthly-inc'] }}">{{ '{:,.0f}'.format(data['monthly-inc']) }}</span></span>
+                <span class="ring-caption">per month</span>
+            </div>
+        </div>
+        <ul class="legend">
+            <li><span class="swatch swatch-save"></span>Save <strong>₹<span data-count="{{ data['monthly-goal'] }}">{{ '{:,.0f}'.format(data['monthly-goal']) }}</span></strong></li>
+            <li><span class="swatch swatch-spend"></span>Spend <strong>₹<span data-count="{{ data['monthly-spend'] }}">{{ '{:,.0f}'.format(data['monthly-spend']) }}</span></strong></li>
+        </ul>
+    </article>
+
+    <article class="card stat spotlight" data-reveal>
+        <span class="stat-icon stat-icon-save"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>
+        <p class="card-label">Save</p>
+        <p class="stat-value">₹<span data-count="{{ data['monthly-goal'] }}">{{ '{:,.0f}'.format(data['monthly-goal']) }}</span><small>/ month</small></p>
+        <p class="stat-sub">₹<span data-count="{{ data['weekly-goal'] }}">{{ '{:,.0f}'.format(data['weekly-goal']) }}</span> / week</p>
+    </article>
+
+    <article class="card stat spotlight" data-reveal>
+        <span class="stat-icon stat-icon-spend"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18l-2 12H5L3 7Z"/><path d="M8 7a4 4 0 0 1 8 0"/></svg></span>
+        <p class="card-label">Spend</p>
+        <p class="stat-value">₹<span data-count="{{ data['monthly-spend'] }}">{{ '{:,.0f}'.format(data['monthly-spend']) }}</span><small>/ month</small></p>
+        <p class="stat-sub">₹<span data-count="{{ data['weekly-spend'] }}">{{ '{:,.0f}'.format(data['weekly-spend']) }}</span> / week</p>
+    </article>
+
+    <article class="card card-tip" data-reveal>
+        <p class="eyebrow">This week</p>
+        <p class="tip-text">Put <strong>₹{{ '{:,.0f}'.format(data['weekly-goal']) }}</strong> away on the day your pocket money arrives. Spend the rest without worrying about it.</p>
+    </article>
+
+    <article class="card card-chart spotlight" data-reveal>
+        <div class="chart-head">
+            <div>
+                <p class="card-label">Savings over the next 12 months</p>
+                <p class="card-sub">Total saved by the end of each month, if you stick to the plan</p>
+            </div>
+        </div>
+        <div class="bars" role="img" aria-label="Savings grow by ₹{{ '{:,.0f}'.format(data['monthly-goal']) }} each month to reach ₹{{ '{:,.0f}'.format(data['yearly-goal']) }}">
+            <div class="bars-grid" aria-hidden="true">
+                <span data-label="₹{{ '{:,.0f}'.format(data['yearly-goal']) }}"></span>
+                <span data-label="₹{{ '{:,.0f}'.format(data['yearly-goal'] / 2) }}"></span>
+                <span data-label="₹0"></span>
+            </div>
+            <div class="bars-plot">
+                {% for m in range(1, 13) %}
+                <div class="bar-col" style="--i: {{ m }}" data-tip="₹{{ '{:,.0f}'.format(data['monthly-goal'] * m) }} saved">
+                    <div class="bar" style="--h: {{ m / 12 * 100 }}">
+                        {% if m == 12 %}<span class="bar-label">₹{{ '{:,.0f}'.format(data['yearly-goal']) }}</span>{% endif %}
+                    </div>
+                    <span class="bar-month" data-offset="{{ m - 1 }}">M{{ m }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="tooltip" aria-hidden="true"></div>
+        </div>
+        <details class="table-view">
+            <summary>View as table</summary>
+            <table>
+                <thead><tr><th>Month</th><th>Saved that month</th><th>Total saved</th></tr></thead>
+                <tbody>
+                {% for m in range(1, 13) %}
+                    <tr><td>Month {{ m }}</td><td>₹{{ '{:,.0f}'.format(data['monthly-goal']) }}</td><td>₹{{ '{:,.0f}'.format(data['monthly-goal'] * m) }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </details>
+    </article>
+</section>
+
+{% else %}
+{# ---------------------------------------------------------------- Landing #}
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow" data-reveal><span class="pulse"></span> A savings planner for your pocket money</p>
+        <h1 class="display display-xl" data-reveal>
+            Know where every rupee <em>goes.</em>
+        </h1>
+        <p class="lede" data-reveal>Enter your monthly pocket money and how much you want to save this year. You'll get a weekly amount to save and a weekly amount you can spend.</p>
+        <div class="hero-cta" data-reveal>
+            <a href="{{ url_for('sign_up') }}" class="btn btn-primary btn-lg magnetic">
+                Build my plan
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-ghost btn-lg">I have an account</a>
+        </div>
+    </div>
+
+    <div class="hero-visual" data-reveal aria-hidden="true">
+        <div class="float-card float-main">
+            <div class="fc-head">
+                <span class="card-label">Example plan</span>
+                <span class="chip">₹2,000 / month</span>
+            </div>
+            <p class="fc-number">₹6,000</p>
+            <p class="card-sub">saved by December</p>
+            <div class="mini-bars">
+                {% for m in range(1, 13) %}<span style="--h: {{ m / 12 * 100 }}; --i: {{ m }}"></span>{% endfor %}
+            </div>
+        </div>
+        <div class="float-card float-a">
+            <span class="swatch swatch-save"></span>
+            <div><p class="fc-small">Save weekly</p><p class="fc-mid">₹115</p></div>
+        </div>
+        <div class="float-card float-b">
+            <span class="swatch swatch-spend"></span>
+            <div><p class="fc-small">Spend weekly</p><p class="fc-mid">₹346</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="steps">
+    <article class="card step spotlight" data-reveal>
+        <span class="step-n">01</span>
+        <h3>Create an account</h3>
+        <p>Pick a username and password. Your plan is saved to your account.</p>
+    </article>
+    <article class="card step spotlight" data-reveal>
+        <span class="step-n">02</span>
+        <h3>Set a goal</h3>
+        <p>Enter your monthly pocket money and how much you want to save by the end of the year.</p>
+    </article>
+    <article class="card step spotlight" data-reveal>
+        <span class="step-n">03</span>
+        <h3>Follow the plan</h3>
+        <p>See how much to save and how much you can spend each week and each month.</p>
+    </article>
+</section>
+{% endif %}
+{% endblock %}

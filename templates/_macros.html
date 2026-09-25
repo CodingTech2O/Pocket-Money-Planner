@@ -1,0 +1,13 @@
+{% macro field(f, type="text", autocomplete="off", prefix=None, toggle=False) %}
+<div class="field{% if f.errors %} has-error{% endif %}{% if prefix %} has-prefix{% endif %}">
+    {% if prefix %}<span class="field-prefix">{{ prefix }}</span>{% endif %}
+    {{ f(class_="input", placeholder=" ", autocomplete=autocomplete, **({"inputmode": "numeric", "min": "1"} if type == "number" else {})) }}
+    <label for="{{ f.id }}">{{ f.label.text }}</label>
+    {% if toggle %}
+    <button type="button" class="reveal-pass" aria-label="Show password" data-target="{{ f.id }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
+    {% endif %}
+    {% for error in f.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+</div>
+{% endmacro %}

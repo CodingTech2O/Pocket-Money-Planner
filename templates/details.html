@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+
+{% block title %}Your plan · Pocket Money Planner{% endblock %}
+
+{% block content %}
+<section class="planner">
+    <div class="card planner-form" data-reveal>
+        <p class="eyebrow">Step 2 of 2</p>
+        <h1 class="display">Set your <em>savings goal.</em></h1>
+        <p class="lede">Enter your pocket money and your goal. The preview updates as you type.</p>
+        <form method="POST" action="{{ url_for('details', username=user) }}" class="form" id="plan-form" novalidate>
+            {{ form.hidden_tag() }}
+            {{ field(form.monthly_pocket_money, type="number", prefix="₹") }}
+            {{ field(form.yearly_save_goal, type="number", prefix="₹") }}
+            <button type="submit" class="btn btn-primary btn-lg btn-block magnetic">
+                Save my plan
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
+            </button>
+        </form>
+    </div>
+
+    <aside class="card preview spotlight" data-reveal aria-live="polite">
+        <p class="card-label">Preview</p>
+        <p class="preview-empty">Enter both amounts to see your plan.</p>
+        <div class="preview-body">
+            <div class="split">
+                <div class="split-bar"><span class="split-save"></span><span class="split-spend"></span></div>
+                <div class="split-legend">
+                    <span><span class="swatch swatch-save"></span>Save <strong data-p="pct-save">0%</strong></span>
+                    <span><span class="swatch swatch-spend"></span>Spend <strong data-p="pct-spend">0%</strong></span>
+                </div>
+            </div>
+            <dl class="preview-grid">
+                <div><dt>Save / month</dt><dd data-p="monthly-goal">₹0</dd></div>
+                <div><dt>Save / week</dt><dd data-p="weekly-goal">₹0</dd></div>
+                <div><dt>Spend / month</dt><dd data-p="monthly-spend">₹0</dd></div>
+                <div><dt>Spend / week</dt><dd data-p="weekly-spend">₹0</dd></div>
+            </dl>
+        </div>
+        <p class="preview-warn">Your goal is more than a full year of pocket money.</p>
+    </aside>
+</section>
+{% endblock %}
